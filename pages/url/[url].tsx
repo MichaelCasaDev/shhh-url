@@ -6,13 +6,12 @@ const Page: NextPage = () => {
 };
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const generatedUrl = "http://localhost:3000/url/" + context.query.url;
+
   const client = await MongoClient.connect(
     "mongodb://127.0.0.1:27017/?readPreference=primary&serverSelectionTimeoutMS=2000&directConnection=true&ssl=false"
   );
   const db = client.db("sh-url");
-
-  const generatedUrl = "http://localhost:3000/url/" + context.query.url;
-
   const doc = await db.collection("urls").findOne({
     generatedUrl,
   });

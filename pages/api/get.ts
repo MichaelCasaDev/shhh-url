@@ -21,6 +21,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       urls.push(doc);
     });
 
+    urls.reverse();
+
     return res.status(200).json({
       urls,
     });
