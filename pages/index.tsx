@@ -1,4 +1,11 @@
+import { DeleteIcon } from "@chakra-ui/icons";
 import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
   Box,
   Button,
   Code,
@@ -19,10 +26,11 @@ import {
   Th,
   Thead,
   Tr,
+  useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const Home: NextPage = () => {
   const [url, setUrl] = useState("");
@@ -30,6 +38,11 @@ const Home: NextPage = () => {
   const [urls, setUrls] = useState([]);
   const [length, setLength] = useState(8);
   const toast = useToast();
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = useRef();
+  const [selectedItem, setSelectedItem] = useState("");
+
   const sliderMarks = [];
 
   for (var x = 8; x <= 64; x += 8) {
@@ -63,7 +76,33 @@ const Home: NextPage = () => {
         description: "Check the generated link at the bottom of the screen",
         status: "success",
         position: "top",
-        duration: 5000,
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  }
+
+  async function deleteURL() {
+    const res = await fetch("/api/delete", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        _id: selectedItem,
+      }),
+    });
+
+    if (res.ok) {
+      getUrls();
+
+      toast({
+        title: "Link deleted successfully!",
+        description:
+          "The link has been removed, new opens will return an 404 page",
+        status: "success",
+        position: "top",
+        duration: 2000,
         isClosable: true,
       });
     }
@@ -166,12 +205,13 @@ const Home: NextPage = () => {
 
       <TableContainer>
         <Heading size="md">URLs</Heading>
-        <Table variant="striped" colorScheme="blue">
+        <Table size="md">
           <Thead>
             <Tr>
               <Th>Original URL</Th>
               <Th>Generated URL</Th>
               <Th isNumeric>Open Times</Th>
+              <Th textAlign="right">Remove</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -185,11 +225,57 @@ const Home: NextPage = () => {
                   {u.generatedUrl}
                 </Td>
                 <Td isNumeric>{u.openTimes}</Td>
+                <Td textAlign="right">
+                  <DeleteIcon
+                    cursor="pointer"
+                    color="red.500"
+                    onClick={() => {
+                      setSelectedItem(u._id);
+                      onOpen();
+                    }}
+                  />
+                </Td>
               </Tr>
             ))}
           </Tbody>
         </Table>
       </TableContainer>
+
+      <AlertDialog
+        isOpen={isOpen}
+        leastDestructiveRef={cancelRef as any}
+        onClose={onClose}
+      >
+        <AlertDialogOverlay zIndex="6000">
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Delete URL
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Are you sure? You can't undo this action afterwards.
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef as any} onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={() => {
+                  deleteURL().then(() => {
+                    setSelectedItem("");
+                    onClose();
+                  });
+                }}
+                ml={3}
+              >
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Stack>
   );
 };
