@@ -12,6 +12,12 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     const length = req.body.length;
     const generatedUrl = "http://localhost:3000/url/" + makeid(length);
 
+    if (!validURL(url)) {
+      return res.status(300).json({
+        error: "URL not valid!",
+      });
+    }
+
     const client = await MongoClient.connect(
       "mongodb://127.0.0.1:27017/?readPreference=primary&serverSelectionTimeoutMS=2000&directConnection=true&ssl=false"
     );
@@ -42,4 +48,17 @@ function makeid(length: number) {
   }
 
   return result;
+}
+
+function validURL(str: string) {
+  var pattern = new RegExp(
+    "^(https?:\\/\\/)?" + // protocol
+      "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+      "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+      "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+      "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+      "(\\#[-a-z\\d_]*)?$",
+    "i"
+  ); // fragment locator
+  return !!pattern.test(str);
 }

@@ -9,6 +9,7 @@ import {
   Box,
   Button,
   Code,
+  Divider,
   Heading,
   Input,
   InputGroup,
@@ -43,8 +44,8 @@ const Home: NextPage = () => {
   const cancelRef = useRef();
   const [selectedItem, setSelectedItem] = useState("");
 
+  // Generate the slide marks for the URL length slider [8 - 16 - 24 - 32 - 40 - 48 - 56 - 64]
   const sliderMarks = [];
-
   for (var x = 8; x <= 64; x += 8) {
     sliderMarks.push(
       <SliderMark value={x} marginTop="2rem" marginLeft="-2.5" fontSize="sm">
@@ -53,6 +54,7 @@ const Home: NextPage = () => {
     );
   }
 
+  // Generate the shorten URL via APIs
   async function generateUrl() {
     const res = await fetch("/api/generate", {
       method: "POST",
@@ -73,8 +75,16 @@ const Home: NextPage = () => {
 
       toast({
         title: "Link created!",
-        description: "Check the generated link at the bottom of the screen",
         status: "success",
+        position: "top",
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "Invalid URL provided",
+        description: "Provide a valid URL and retry...",
+        status: "error",
         position: "top",
         duration: 3000,
         isClosable: true,
@@ -82,6 +92,7 @@ const Home: NextPage = () => {
     }
   }
 
+  // Delete genrated URL via APIs
   async function deleteURL() {
     const res = await fetch("/api/delete", {
       method: "POST",
@@ -94,7 +105,7 @@ const Home: NextPage = () => {
     });
 
     if (res.ok) {
-      getUrls();
+      getUrls(false);
 
       toast({
         title: "Link deleted successfully!",
@@ -108,6 +119,7 @@ const Home: NextPage = () => {
     }
   }
 
+  // Copy a text to the clipboard
   function copyToClipboard(text?: string) {
     navigator.clipboard.writeText(text || generatedUrl);
 
@@ -120,18 +132,22 @@ const Home: NextPage = () => {
     });
   }
 
-  async function getUrls() {
+  // Get all URLs generated
+  async function getUrls(timeout?: boolean) {
     const res = await fetch("/api/get");
     if (res.ok) {
       const json = await res.json();
       setUrls(json.urls);
 
-      setTimeout(() => {
-        getUrls();
-      }, 2000);
+      if (timeout || true) {
+        setTimeout(() => {
+          getUrls();
+        }, 2000);
+      }
     }
   }
 
+  // Fetch URLs on render
   useEffect(() => {
     getUrls();
   }, []);
@@ -175,7 +191,7 @@ const Home: NextPage = () => {
         </InputGroup>
 
         <Stack spacing="1rem" direction="row">
-          <Heading size="sm">Length</Heading>
+          <Heading size="sm">Suffix Length</Heading>
           <Slider
             defaultValue={length}
             min={8}
@@ -193,6 +209,8 @@ const Home: NextPage = () => {
         </Stack>
       </Stack>
 
+      <Divider />
+
       <Code
         cursor={generatedUrl != "..." ? "pointer" : "default"}
         padding="1rem"
@@ -202,6 +220,8 @@ const Home: NextPage = () => {
       >
         {generatedUrl}
       </Code>
+
+      <Divider />
 
       <TableContainer>
         <Heading size="md">URLs</Heading>
