@@ -24,6 +24,7 @@ import {
   TableContainer,
   Tbody,
   Td,
+  Tfoot,
   Th,
   Thead,
   Tr,
@@ -258,6 +259,19 @@ const Home: NextPage = () => {
               </Tr>
             ))}
           </Tbody>
+          <Tfoot>
+            <Tr>
+              <Th>Total shorten URLs -{urls.length}</Th>
+              <Th></Th>
+              <Th isNumeric>
+                Total Open Times -{" "}
+                {urls.reduce((accumulator: number, u: any) => {
+                  return accumulator + u.openTimes;
+                }, 0)}
+              </Th>
+              <Th></Th>
+            </Tr>
+          </Tfoot>
         </Table>
       </TableContainer>
 

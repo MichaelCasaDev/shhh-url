@@ -6,26 +6,27 @@ const Page: NextPage = () => {
 };
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const generatedUrl = "http://localhost:3000/url/" + context.query.url;
+  const generatedUrl = "http://localhost:3000/" + context.query.url;
 
   const client = await MongoClient.connect(
     "mongodb://127.0.0.1:27017/?readPreference=primary&serverSelectionTimeoutMS=2000&directConnection=true&ssl=false"
   );
   const db = client.db("sh-url");
-  const doc = await db.collection("urls").findOne({
-    generatedUrl,
-  });
-
-  if (doc) {
-    await db.collection("urls").updateOne(doc, {
+  const doc: any = await db.collection("urls").findOneAndUpdate(
+    {
+      generatedUrl,
+    },
+    {
       $inc: {
         openTimes: 1,
       },
-    });
+    }
+  );
 
+  if (doc) {
     return {
       redirect: {
-        destination: doc.url,
+        destination: doc.value.url,
         permanent: false,
       },
     };

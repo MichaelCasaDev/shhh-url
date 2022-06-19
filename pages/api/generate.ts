@@ -10,7 +10,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     }
     const url = req.body.url;
     const length = req.body.length;
-    const generatedUrl = "http://localhost:3000/url/" + makeid(length);
+    const generatedUrl = "http://localhost:3000/" + makeid(length);
 
     if (!validURL(url)) {
       return res.status(300).json({
