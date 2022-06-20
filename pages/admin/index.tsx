@@ -33,6 +33,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import Cookies from "cookies";
+import CryptoJS from "crypto-js";
 import type { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -53,7 +54,13 @@ const Home: NextPage = () => {
   const sliderMarks = [];
   for (var x = 8; x <= 64; x += 8) {
     sliderMarks.push(
-      <SliderMark value={x} marginTop="2rem" marginLeft="-2.5" fontSize="sm">
+      <SliderMark
+        key={x}
+        value={x}
+        marginTop="2rem"
+        marginLeft="-2.5"
+        fontSize="sm"
+      >
         {x}
       </SliderMark>
     );
@@ -353,10 +360,13 @@ export function getServerSideProps(context: GetServerSidePropsContext) {
   const cookies = Cookies(context.req, context.res);
   const token = cookies.get("token");
 
-  if (token && token == "test") {
-    return {
-      props: {},
-    };
+  if (token) {
+    const decrypted = CryptoJS.AES.decrypt(token, "Secret Passphrase");
+    if (decrypted.toString(CryptoJS.enc.Utf8) == "test") {
+      return {
+        props: {},
+      };
+    }
   }
 
   return {

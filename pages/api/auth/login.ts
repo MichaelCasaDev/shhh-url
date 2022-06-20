@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Cookies from "cookies";
+import CryptoJS from "crypto-js";
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   (async () => {
@@ -10,6 +11,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const password = req.body.password;
+    const encrypted = CryptoJS.AES.encrypt(password, "Secret Passphrase");
 
     if (!password || password != "test") {
       return res.status(300).json({
@@ -18,7 +20,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const cookies = new Cookies(req, res);
-    cookies.set("token", "test", {
+    cookies.set("token", encrypted.toString(), {
       maxAge: 60 * 60 * 24 * 1000, // 1 day
     });
 
