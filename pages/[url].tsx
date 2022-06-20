@@ -21,7 +21,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     }
   );
 
-  if (doc) {
+  if (doc.value) {
     return {
       redirect: {
         destination: doc.value.url,
