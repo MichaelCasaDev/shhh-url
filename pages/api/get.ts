@@ -10,9 +10,9 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const client = await MongoClient.connect(
-      "mongodb://127.0.0.1:27017/?readPreference=primary&serverSelectionTimeoutMS=2000&directConnection=true&ssl=false"
+      process.env.DATABASE_URI as string
     );
-    const db = client.db("sh-url");
+    const db = client.db("shhh-url");
 
     const urls: any[] = [];
 

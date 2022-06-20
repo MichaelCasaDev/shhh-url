@@ -13,7 +13,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-const Home: NextPage = () => {
+export default function Page() {
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const router = useRouter();
@@ -41,7 +41,7 @@ const Home: NextPage = () => {
       });
 
       setTimeout(() => {
-        router.push("/admin");
+        router.push("/dashboard");
       }, 1000);
     } else {
       toast({
@@ -81,6 +81,4 @@ const Home: NextPage = () => {
       </Center>
     </>
   );
-};
-
-export default Home;
+}
