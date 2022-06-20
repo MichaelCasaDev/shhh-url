@@ -4,10 +4,11 @@ A simple self-hosted url shortner
 
 ## Setup
 A simple `.ENV` file to save some usefull variables that will be used by **Shhh URL**.
-```toml
+```
   PASSWORD=<dashboard password>
   SECRET=<a string to encrypt the dashboard password>
-
+  
+  BASE_URI=<uri of shh url>
   DATABASE_URI=<uri for the connection with the database>
 ```
 

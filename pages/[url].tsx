@@ -6,7 +6,7 @@ export default function Page() {
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const generatedUrl = "http://localhost:3000/" + context.query.url;
+  const generatedUrl = (process.env.BASE_URI as string) + context.query.url;
 
   const client = await MongoClient.connect(process.env.DATABASE_URI as string);
   const db = client.db("shhh-url");
