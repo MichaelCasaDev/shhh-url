@@ -11,6 +11,7 @@ import {
   Code,
   Divider,
   Heading,
+  HStack,
   Input,
   InputGroup,
   InputRightElement,
@@ -31,7 +32,9 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import type { NextPage } from "next";
+import Cookies from "cookies";
+import type { GetServerSidePropsContext, NextPage } from "next";
+import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 
 const Home: NextPage = () => {
@@ -40,6 +43,7 @@ const Home: NextPage = () => {
   const [urls, setUrls] = useState([]);
   const [length, setLength] = useState(8);
   const toast = useToast();
+  const router = useRouter();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef();
@@ -148,6 +152,30 @@ const Home: NextPage = () => {
     }
   }
 
+  async function logout() {
+    const res = await fetch("/api/auth/logout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (res.ok) {
+      toast({
+        title: "Logged out successfull!",
+        description: "Redirecting to the login page...",
+        status: "success",
+        isClosable: true,
+        duration: 2000,
+        position: "top",
+      });
+
+      setTimeout(() => {
+        router.push("/admin/login");
+      }, 1000);
+    }
+  }
+
   // Fetch URLs on render
   useEffect(() => {
     getUrls();
@@ -157,7 +185,12 @@ const Home: NextPage = () => {
     <Stack spacing="4rem" padding="2rem">
       <Stack>
         <Heading>Shhh URL</Heading>
-        <Heading size="sm">A simple self-hosted url shortner</Heading>
+        <HStack>
+          <Heading size="sm">A simple self-hosted url shortner</Heading>
+          <Button size="sm" colorScheme="red" onClick={logout}>
+            Logout
+          </Button>
+        </HStack>
       </Stack>
 
       <Stack spacing={4}>
@@ -315,3 +348,21 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+export function getServerSideProps(context: GetServerSidePropsContext) {
+  const cookies = Cookies(context.req, context.res);
+  const token = cookies.get("token");
+
+  if (token && token == "test") {
+    return {
+      props: {},
+    };
+  }
+
+  return {
+    redirect: {
+      destination: "/admin/login",
+      permanent: false,
+    },
+  };
+}
