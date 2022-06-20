@@ -11,7 +11,8 @@ A simple `.ENV` file to save some usefull variables that will be used by **Shhh
   BASE_URI=<uri of shh url>
   DATABASE_URI=<uri for the connection with the database>
 ```
-
+## Contributing
+Feel free to contribute and open pull requests to made a better version of **Shhh URL** 😉
 
 ## License
 
