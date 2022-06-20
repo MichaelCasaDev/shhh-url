@@ -11,13 +11,17 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const password = req.body.password;
-    const encrypted = CryptoJS.AES.encrypt(password, "Secret Passphrase");
 
-    if (!password || password != "test") {
+    if (!password || password != (process.env.PASSWORD as string)) {
       return res.status(300).json({
         error: "Invalid password provided!",
       });
     }
+
+    const encrypted = CryptoJS.AES.encrypt(
+      password,
+      process.env.SECRET as string
+    );
 
     const cookies = new Cookies(req, res);
     cookies.set("token", encrypted.toString(), {

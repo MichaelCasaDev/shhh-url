@@ -361,8 +361,10 @@ export function getServerSideProps(context: GetServerSidePropsContext) {
   const token = cookies.get("token");
 
   if (token) {
-    const decrypted = CryptoJS.AES.decrypt(token, "Secret Passphrase");
-    if (decrypted.toString(CryptoJS.enc.Utf8) == "test") {
+    const decrypted = CryptoJS.AES.decrypt(token, process.env.SECRET as string);
+    if (
+      decrypted.toString(CryptoJS.enc.Utf8) == (process.env.PASSWORD as string)
+    ) {
       return {
         props: {},
       };
